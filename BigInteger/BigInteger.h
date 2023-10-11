@@ -17,11 +17,11 @@ namespace DDP {
             const char * what() const noexcept override;
         };
 
-        BigInteger(std::string str = "");
-        BigInteger(long long ll);
-        BigInteger(unsigned long long ull);
-        BigInteger(int i);
-        BigInteger(unsigned int ui);
+        explicit BigInteger(std::string str = "");
+//        explicit BigInteger(signed long long ll);
+//        explicit BigInteger(unsigned long long ull);
+        explicit BigInteger(int i);
+//        explicit BigInteger(unsigned int ui);
 
         friend std::ostream &operator<<(std::ostream &os, const BigInteger &bi);
 
@@ -55,8 +55,9 @@ namespace DDP {
         friend BigInteger operator*(const BigInteger &left, const BigInteger &right);
         friend BigInteger operator/(const BigInteger &left, int right);
         friend BigInteger operator/(const BigInteger &left, const BigInteger &right);
+        friend BigInteger operator%(const BigInteger &left, const BigInteger &right);
 
-//        friend BigInteger operator%(const BigInteger &left, const BigInteger &right);
+        std::string toString() const;
 //
 //        bool odd() const;
 //

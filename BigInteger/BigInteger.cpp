@@ -29,20 +29,20 @@ namespace DDP {
             _removeLeadingZeros();
         }
     }
-    BigInteger::BigInteger(long long ll) {
-        if (ll < 0) {
-            _isNegative = true;
-            ll = -ll;
-        } else
-            _isNegative = false;
-        for (; ll > 0; ll /= BASE)
-            _digits.push_back(static_cast<int>(ll % BASE));
-    }
-    BigInteger::BigInteger(unsigned long long ull) {
-        _isNegative = false;
-        for (; ull > 0; ull /= BASE)
-            _digits.push_back(static_cast<int>(ull % BASE));
-    }
+//    BigInteger::BigInteger(long long ll) {
+//        if (ll < 0) {
+//            _isNegative = true;
+//            ll = -ll;
+//        } else
+//            _isNegative = false;
+//        for (; ll > 0; ll /= BASE)
+//            _digits.push_back(static_cast<int>(ll % BASE));
+//    }
+//    BigInteger::BigInteger(unsigned long long ull) {
+//        _isNegative = false;
+//        for (; ull > 0; ull /= BASE)
+//            _digits.push_back(static_cast<int>(ull % BASE));
+//    }
     BigInteger::BigInteger(int i) {
         if (i < 0) {
             _isNegative = true;
@@ -52,24 +52,15 @@ namespace DDP {
         if (i != 0)
             _digits.push_back(i);
     }
-    BigInteger::BigInteger(unsigned int ui) {
-        _isNegative = false;
-        for (; ui > 0; ui /= BASE)
-            _digits.push_back(static_cast<int>(ui % BASE));
-    }
+//    BigInteger::BigInteger(unsigned int ui) {
+//        _isNegative = false;
+//        for (; ui > 0; ui /= BASE)
+//            _digits.push_back(static_cast<int>(ui % BASE));
+//    }
+
 
     std::ostream &operator<<(std::ostream &os, const BigInteger &bi) {
-        if (bi._digits.empty()) os << 0;
-        else {
-            if (bi._isNegative)
-                os << '-';
-            os << bi._digits.back();
-            char old_fill = os.fill('0');
-            for (long long i = static_cast<long long>(bi._digits.size()) - 2; i >= 0; --i)
-                os << std::setw(9) << bi._digits[i];
-            os.fill(old_fill);
-        }
-        return os;
+        return os << bi.toString();
     }
 
 
@@ -119,7 +110,7 @@ namespace DDP {
     BigInteger operator+(const BigInteger &left, const BigInteger &right) {
         if (left._isNegative != right._isNegative)
             return left._isNegative ? right - (-left) : left - (-right);
-        bool isLeftFirst = left._digits >= right._digits;
+        bool isLeftFirst = left._digits.size() >= right._digits.size();
         const BigInteger *ptrSecond = isLeftFirst ? &right : &left;
         BigInteger result = isLeftFirst ? left : right;
         for (size_t i = 0; i < ptrSecond->_digits.size(); ++i)
@@ -225,7 +216,7 @@ namespace DDP {
 
     BigInteger operator>>(const BigInteger &bi, size_t n) {
         if (bi._digits.empty())
-            return 0;
+            return BigInteger(0);
         if (n == 0)
             return bi;
         BigInteger result = bi;
@@ -238,7 +229,7 @@ namespace DDP {
     }
     BigInteger operator<<(const BigInteger &bi, size_t n) {
         if (bi._digits.size() <= n)
-            return 0;
+            return BigInteger(0);
         if (n == 0)
             return bi;
         BigInteger result;
@@ -286,17 +277,36 @@ namespace DDP {
     BigInteger operator/(const BigInteger &left, const BigInteger &right) {
         if (right._digits.empty())
             throw BigInteger::DivideByZero();
-        if (left._digits.empty() ||  abs(left) < abs(right))
-            return 0;
-        BigInteger absLeft = abs(left),
+        BigInteger absLeft  = abs(left),
                    absRight = abs(right);
-        BigInteger l = BigInteger(left._digits.back() / (right._digits.back() + 1)) >> (left._digits.size() - right._digits.size()),
-                   r = (BigInteger((left._digits.back() + 1) / right._digits.back()) >> (left._digits.size() - right._digits.size())) + 1;
-        for (BigInteger m = (l + r) / 2; l + 1 < r; m = (l + r) / 2)
+        if (left._digits.empty() ||  absLeft < absRight)
+            return BigInteger(0);
+        int divBack = absLeft._digits.back() / absRight._digits.back(),
+            difSize = absLeft._digits.size() - absRight._digits.size();
+        BigInteger l = BigInteger(std::max(divBack - 1, 0)) >> difSize,
+                   r = BigInteger(divBack + 1) >> difSize;
+        for (BigInteger m = (l + r) / 2; l + BigInteger(1) < r; m = (l + r) / 2)
             m * absRight <= absLeft ? l = m : r = m;
-        if (left._isNegative != right._isNegative)
-            l._isNegative = true;
-        return l;
+        l._isNegative = r._isNegative =  (left._isNegative != right._isNegative);
+        return (abs(r) * absRight > absLeft) ? l : r;
+    }
+    BigInteger operator%(const BigInteger &left, const BigInteger &right) {
+        return left - right * (left / right);
+    }
+
+
+    std::string BigInteger::toString() const {
+        if (_digits.empty())
+            return "0";
+        std::stringstream ss;
+        if (_isNegative)
+            ss << "-";
+        ss << _digits.back();
+        char old_fill = ss.fill('0');
+        for (long long i = static_cast<long long>(_digits.size()) - 2; i >= 0; --i)
+            ss << std::setw(9) << _digits[i];
+        ss.fill(old_fill);
+        return ss.str();
     }
 
 
