@@ -1,6 +1,7 @@
+#include "BigInteger/BigInteger.h"
+#include <conio.h>
 #include <iostream>
 #include <iomanip>
-#include "BigInteger/BigInteger.h"
 
 using namespace std;
 using namespace DDP;
@@ -9,6 +10,10 @@ using namespace DDP;
 size_t absSize(const BigInteger &bi);
 string toAbsString(const BigInteger &bi);
 
+void pressAnyKeyForContinue() {
+    cout << "PressAnyKeyForContinue" << flush;
+    getch();
+}
 
 int main() {
     cout << "Big integer division!"
@@ -53,6 +58,7 @@ int main() {
     auto oldFill = cout.fill('0');
     cout << ((mantissa < BigInteger(0)) ? "-" : "+") << "0." << toAbsString(mantissa)
          << "E" << ((exponent < BigInteger(0)) ? "-" : "+") << setw(5) << toAbsString(exponent) << endl;
+    pressAnyKeyForContinue();
     return 0;
 }
 

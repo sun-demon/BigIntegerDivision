@@ -1,7 +1,3 @@
-//
-// Created by Daniil on 07.10.2023.
-//
-
 #include "BigInteger.h"
 #include <ostream>
 #include <iomanip>

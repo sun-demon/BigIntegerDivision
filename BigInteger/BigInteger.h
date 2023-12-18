@@ -1,7 +1,3 @@
-//
-// Created by Daniil on 07.10.2023.
-//
-
 #ifndef BIGINTEGERDIVISION_BIGINTEGER_H
 #define BIGINTEGERDIVISION_BIGINTEGER_H
 
